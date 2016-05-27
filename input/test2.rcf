@@ -1,0 +1,14 @@
+[Relational Context]
+Default Name
+[Binary Relation]
+Default Name
+R0 | R1 | R2 | R3 | R4 | R5 | 
+IngressPort=1 | IngressPort=2 | IngressPort=3 | IngressPort=4 | IngressPort=5 | IngressVPort=6 | IngressVPort=7 | IngressVPort=8 | IngressVPort=9 | IngressVPort=10 | EtherSrc=ff:ff:ff:ff:ff:ff | EtherSrc=00:1a:00:89:AB:CD | EtherSrc=00:2a:01:64:8d:19 | EtherSrc=00:AA:00:EF:C7:9F | EtherDst=00:02:00:5A:CE:90 | EtherDst=00:AB:00:02:00:5A | EtherDst=00:11:FE:CE:90:1A | IpSrc=10.1.0.0/16 |
+1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 1 1 
+1 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 1 0 
+0 0 0 1 0 1 0 0 0 0 0 0 1 0 1 0 0 1 
+0 1 0 0 0 1 0 0 0 0 0 0 1 0 0 1 0 0
+0 0 1 0 0 0 0 1 0 0 1 0 0 0 1 0 0 0
+0 0 0 0 1 0 1 0 0 0 1 0 0 0 1 0 0 0
+
+[END Relational Context]

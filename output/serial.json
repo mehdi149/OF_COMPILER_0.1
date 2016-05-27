@@ -1,0 +1,43 @@
+{
+	"chart": {
+		"rootOrientation": "WEST",
+		"container": "#tree-simple",
+		"padding": 0,
+		"connectors": {
+			"type": "curve"
+		},
+		"node": {
+			"HTMLclass": "nodeExample1"
+		}
+	},
+
+	"nodeStructure":{
+		"text":{"name":""},
+		"children":[
+			{
+			"text":{"name":"IpSrc=10.1.0.0/16??1.0"},
+			"children":[
+				{"text":{"name":"R0,R2"}, "HTMLclass":"rule_subset"}
+			  ]
+			 },
+			{
+			"text":{"name":"EtherDst=00:11:FE:CE:90:1A??0.8500000238418579"},
+			"children":[
+				{"text":{"name":"R0,R1"}, "HTMLclass":"rule_subset"}
+			  ]
+			 },
+			{
+			"text":{"name":"EtherSrc=00:2a:01:64:8d:19??0.8500000238418579"},
+			"children":[
+				{"text":{"name":"R2,R3"}, "HTMLclass":"rule_subset"}
+			  ]
+			 },
+			{
+			"text":{"name":"EtherSrc=ff:ff:ff:ff:ff:ff??0.8500000238418579"},
+			"children":[
+				{"text":{"name":"R4,R5"}, "HTMLclass":"rule_subset"}
+			  ]
+			 }
+			]
+	}
+}

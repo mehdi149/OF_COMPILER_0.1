@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<switch>
+    <bridges>
+      <bridge>
+       <name> OpenVswitchs</name>
+       <nbr_ports> 5 </nbr_ports>
+       <type> Internal </type>
+      </bridge>
+    </bridges>
+	<ports>
+		<port>
+	     <tag> 1 </tag>
+		<interface>
+			    <ofport>1</ofport>
+				<type></type>
+				<name>eth0</name>
+				<link_speed>1000</link_speed>
+				<link_state></link_state>
+				<ingress_policing_rate></ingress_policing_rate>
+				<ingress_policing_burst></ingress_policing_burst>
+				<duplex>
+				</duplex>
+			    <bandwidth>
+                   <inbound average='1000' peak='5000' floor='200' burst='1024'/>
+                   <outbound average='128' peak='256' burst='256'/>
+                </bandwidth>
+			</interface>		
+		</port>
+		<port>
+			<tag></tag>
+			<interface>
+				<type></type>
+				<name></type>
+				<link_speed></link_speed>
+				<link_state></link_state>
+				<ingress_policing_rate></ingress_policing_rate>
+				<ingress_policing_burst></ingress_policing_burst>
+				<duplex></duplex>
+                <bandwidth>
+                   <inbound average='1000' peak='5000' floor='200' burst='1024'/>
+                   <outbound average='128' peak='256' burst='256'/>
+                </bandwidth>
+				
+			</interface>
+		</port>
+          ...
+          ...
+          ...
+          ...
+          ...
+
+	</ports>
+	<flow-tables>
+
+		<flow-table>
+			<id></id>
+			<matchfields>
+				<field>
+                   <type></type>
+                   <matching_latency_min> <matching_latency_min>
+                   <matching_latency_max> <matching_latency_max>
+				</field>
+				<field>
+					 <type> </type>
+				     <matching_latency_min> <matching_latency_min>
+                     <matching_latency_max> <matching_latency_max>
+				</field>
+			</matchfields>
+			<flow-limit></flow-limit>
+
+	    </flow-table>
+	    <flow-table>
+			<id></id>
+			<matchfields>
+				<field>
+                   <type></type>
+				</field>
+				<field>
+					 <type></type>
+				</field>
+			</matchfields>
+			<flow-limit></flow-limit>
+
+	    </flow-table>
+	       ...
+	       ...
+	       ...
+	       ...
+	       ...
+	       ...
+	       ...
+	   </flow-tables>
+       <cpu>
+           <processor></processor>
+           <memory>
+           </memory>
+           <load_average>
+           </load_average>
+       </cpu>
+       
+       <n-handler-threads> </n-handler-threads>
+
+</switch>

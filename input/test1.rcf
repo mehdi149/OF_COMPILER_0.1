@@ -1,0 +1,13 @@
+[Relational Context]
+Default Name
+[Binary Relation]
+Default Name
+R0 | R1 | R2 | R3 | R4 | R5 |
+IngressPort = 1 | IngressVPort = 2 | EtherSrc =00:01:00:11:00 | EtherDst=00:01:00:11:00
+	EtherType,
+	VlanId,
+	IpSrc,
+	IpDst,
+	PortSrc,
+	PortDst;
+	
