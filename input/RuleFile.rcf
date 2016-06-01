@@ -1,0 +1,10 @@
+[Relational Context]
+Default Name
+[Binary Relation]
+Default Name
+R0 | R1 | R2 | 
+dl_type=0x800 | tp_src=520 | dl_type=0x806
+1 0 0 
+1 1 0 
+0 0 1 
+[END Relational Context]

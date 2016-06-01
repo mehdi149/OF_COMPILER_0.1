@@ -10,32 +10,42 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.floodlightcontroller.core.internal.OFMessageEncoder;
 import net.floodlightcontroller.packetstreamer.thrift.Message;
 
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFFactories;
 import org.projectfloodlight.openflow.protocol.OFFactory;
+import org.projectfloodlight.openflow.protocol.OFFlowMod;
 import org.projectfloodlight.openflow.protocol.OFMessage;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.OFType;
 import org.projectfloodlight.openflow.protocol.OFVersion;
+import org.projectfloodlight.openflow.protocol.match.Match;
+import org.projectfloodlight.openflow.protocol.match.MatchField;
 
+/*import org.apache.derby.tools.sysinfo;
 import org.apache.thrift.protocol.TProtocol;
 import org.openflow.io.OFMessageAsyncStream;
+import org.openflow.io.OFMessageInStream;
 import org.openflow.protocol.OFEchoReply;
 import org.openflow.protocol.OFFlowMod;
 import org.openflow.protocol.OFMatch;
-import org.openflow.protocol.OFEchoRequest;
+import org.openflow.protocol.OFEchoRequest;*/
 //import org.openflow.protocol.OFMessage;
-import org.openflow.protocol.OFPacketIn;
+/*import org.openflow.protocol.OFPacketIn;
 import org.openflow.protocol.OFPacketOut;
 import org.openflow.protocol.OFPort;
 import org.openflow.protocol.OFType;
 import org.openflow.protocol.action.OFAction;
 import org.openflow.protocol.action.OFActionOutput;
 import org.openflow.protocol.factory.BasicFactory;
+import org.openflow.protocol.factory.OFActionFactoryAware;
+import org.openflow.protocol.factory.OFMessageFactoryAware;
+import org.openflow.protocol.factory.OFStatisticsFactoryAware;
 import org.openflow.util.LRULinkedHashMap;
 import org.openflow.util.U16;
-
+import static io.netty.buffer.Unpooled.*;*/
 
 public class OpenFlow_Handler {
 	public static ThreadSockets thread_sockets;
@@ -91,17 +101,20 @@ class ThreadSockets extends Thread {
         for (OFMessage msg : msgs){
         	System.out.println(msgs.size());
         	
-        	/*if( msg.getType() == OFType.FLOW_MOD){
+        	if( msg.getType() == OFType.FLOW_MOD){
         		// get of flow mod rule and add it to rcf 
         		System.out.println("of flow mod");
         		OFFlowMod flow_mod_msg = (OFFlowMod)msg;
-        		OFMatch match = flow_mod_msg.getMatch();
+        		Match match = flow_mod_msg.getMatch();
         		String match_string = match.toString();
-        		System.out.println(match);
-        		match_string =  match_string.replace("OFMatch[","");
-        		match_string =  match_string.replace("]","");
+        		if(!match_string.equals("OFMatchV3Ver13()")){
+        			
+        		System.out.println("match :"+match);
+        		match_string =  match_string.replace("OFMatchV3Ver13(","");
+        		match_string =  match_string.replace(")","");
         		List<String>Attributes = Arrays.asList(match_string.split(","));
         		System.out.println(Attributes.size());
+        		System.out.println("Attributes : "+Attributes);
         		String Attribute_rcf_delimited = String.join(" | ",Attributes);
         		System.out.println(Attribute_rcf_delimited);
         		// Open the file
@@ -140,20 +153,44 @@ class ThreadSockets extends Thread {
         		  if(cpt == AttrPosition){
         			  System.out.println("in Attr Position");
         			  List<String> attrs = Arrays.asList(strLine.split("\\|"));
+        			  for(int tmp=0;tmp<attrs.size();tmp++){
+        				 
+        				 attrs.set(tmp,attrs.get(tmp).trim());
+        			  }
         			  // Adding New Attributes  to  Rcf File 
+        			  System.out.println(attrs);
         			  for(String attr :Attributes){
-        				  if(!attrs.contains(attr)){
+        				  System.out.println(attr);
+        				  if(!attrs.contains(attr.trim())){
         					  //Concat 
+        					  System.out.println(attr);
         					  attrs = new ArrayList<String>(attrs);
         					  attrs.add(attr);
-        					  Attribute_rcf_delimited =strLine.concat(" | "+attr);
-        					  // Add Column to matrice
-        					  for(int i=0;i<nbrOfRules-1;i++){
-        						  strLine = br.readLine();
-        						  String lineMatrice = strLine.concat("0 ");
-        						  NewMatrice.add(lineMatrice);
-        					  }
+        					  System.out.println("strline : "+strLine);
         					  
+        					  Attribute_rcf_delimited =strLine.concat(" | "+attr.trim());
+        					   strLine=Attribute_rcf_delimited ;
+        					  System.out.println("Delimited Attr :"+Attribute_rcf_delimited);
+        					  // Add Column to matrice
+        					  System.out.println("nbrOfRules:  "+nbrOfRules);
+        					  br.mark(5);
+        					  for(int i=0;i<nbrOfRules-1;i++){
+        						 
+        						  if(NewMatrice.size()==0){
+        						  System.out.println(i);
+        						  String strLine1 = br.readLine();
+        						  
+        						  System.out.println(strLine1);
+        						  String lineMatrice = strLine1.concat("0 ");
+        						  NewMatrice.add(lineMatrice);
+        						  }else{
+        							  System.out.println("line index : "+i);
+        							  String lineMatrice= NewMatrice.get(i);
+        							  NewMatrice.set(i,lineMatrice.concat("0 "));
+        							  
+        						  }
+        					  }
+        					  br.reset();
         					  
         				  }
         			  }
@@ -187,8 +224,9 @@ class ThreadSockets extends Thread {
         		}
         		//Close the input stream
         		br.close(); 
-        		}*/
+        		}
         		
+        	}
         	
         		
         		
@@ -212,6 +250,7 @@ class ThreadSockets extends Thread {
         for (String line : matrices){
         	writer.println(line);
         }
+        writer.println("");
         writer.println("[END Relational Context]");
         writer.close();
         File oldFile = new File("RuleFile.rcf");;
@@ -275,30 +314,33 @@ class ThreadSockets extends Thread {
             int bytes_read;
             try {
                 while ((bytes_read = inFromServer.read(reply)) != -1) {
+                	 System.out.println("serialize");
                     outToClient.write(reply, 0, bytes_read);
-                    outToClient.flush();
-                   /* ByteBuffer bb = ByteBuffer.wrap(reply,0,bytes_read);
-                    bb.order(ByteOrder.BIG_ENDIAN);*/
-                    OFFactory my13Factory = OFFactories.getFactory(OFVersion.OF_13);
+                    ByteBuf bb= wrappedBuffer(reply,0,bytes_read);
+                    bb.order(ByteOrder.BIG_ENDIAN);
                     OFMessageReader<OFMessage> reader= OFFactories.getGenericReader();
-                    System.out.println(bytes_read);
-                    ByteBuf byte_buf = wrappedBuffer(reply,0,bytes_read);
-                    byte_buf.order(ByteOrder.BIG_ENDIAN);
-                    System.out.println(bytes_read);
-                    
-                    OFMessage message =  reader.readFrom(byte_buf);
-                    System.out.println(message);
-                    System.out.println(message.getClass().getName());
-                    /*BasicFactory factory = new BasicFactory();
-                    final List<OFMessage> msgs = factory.parseMessages(bb);
-                    System.out.println(msgs);
+                    final List<OFMessage> results = new ArrayList<OFMessage>();
+                    OFMessage demux;
+                    OFMessage ofm;
+                    int limit =0;
+                    while (bb.isReadable()) {
+                        ofm = reader.readFrom(bb);
+                       ByteBuf temp_buf = buffer();
+                       ofm.writeTo(temp_buf);
+                       int index= temp_buf.readableBytes();
+                       bb.getBytes(index, bb);
+                       results.add(ofm);
+                        
+                    }
+ 
+				System.out.println(results);
                     // get of flow Mod packet type and store it to rcf file 
-                    new Thread(){public void run(){try {
-						ThreadSockets.OFHandler(msgs);
+                   new Thread(){public void run(){try {
+						ThreadSockets.OFHandler(results);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}}}.start();*/
+					}}}.start();
                     }        
                 
             } catch (IOException e) {
