@@ -9,6 +9,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.floodlightcontroller.core.internal.OFMessageEncoder;
 import net.floodlightcontroller.packetstreamer.thrift.Message;
@@ -118,7 +119,11 @@ class ThreadSockets extends Thread {
         		String Attribute_rcf_delimited = String.join(" | ",Attributes);
         		System.out.println(Attribute_rcf_delimited);
         		// Open the file
+        		ReentrantLock lock = new ReentrantLock();
+        		try{
+                lock.lock();
         		FileInputStream fstream = new FileInputStream("RuleFile.rcf");
+       
         		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 
         		String strLine;
@@ -151,6 +156,7 @@ class ThreadSockets extends Thread {
         		  }                   			  
         			  //br.write(strLine);                    			  
         		  if(cpt == AttrPosition){
+        			  Attribute_rcf_delimited=strLine;
         			  System.out.println("in Attr Position");
         			  List<String> attrs = Arrays.asList(strLine.split("\\|"));
         			  for(int tmp=0;tmp<attrs.size();tmp++){
@@ -161,6 +167,20 @@ class ThreadSockets extends Thread {
         			  System.out.println(attrs);
         			  for(String attr :Attributes){
         				  System.out.println(attr);
+        				  
+    					  // get  matrice from file
+    					  if(NewMatrice.size()==0){
+    						  br.mark(5);
+    					  for(int i=0;i<nbrOfRules-1;i++){
+    					  
+    						  String strLine1 = br.readLine(); 
+    						  String lineMatrice = strLine1;
+    						  System.out.println("lineMatrice: "+lineMatrice);
+    						  NewMatrice.add(lineMatrice);
+    					  }
+    					  br.reset();
+    					  }
+    					
         				  if(!attrs.contains(attr.trim())){
         					  //Concat 
         					  System.out.println(attr);
@@ -169,32 +189,25 @@ class ThreadSockets extends Thread {
         					  System.out.println("strline : "+strLine);
         					  
         					  Attribute_rcf_delimited =strLine.concat(" | "+attr.trim());
-        					   strLine=Attribute_rcf_delimited ;
+        					  strLine=Attribute_rcf_delimited ;
         					  System.out.println("Delimited Attr :"+Attribute_rcf_delimited);
-        					  // Add Column to matrice
+        					 
         					  System.out.println("nbrOfRules:  "+nbrOfRules);
-        					  br.mark(5);
+        					
+        					  System.out.println("size matrice : "+NewMatrice.size());
+        					  System.out.println();
+        					  // Add Column to matrice
         					  for(int i=0;i<nbrOfRules-1;i++){
-        						 
-        						  if(NewMatrice.size()==0){
-        						  System.out.println(i);
-        						  String strLine1 = br.readLine();
-        						  
-        						  System.out.println(strLine1);
-        						  String lineMatrice = strLine1.concat("0 ");
-        						  NewMatrice.add(lineMatrice);
-        						  }else{
         							  System.out.println("line index : "+i);
         							  String lineMatrice= NewMatrice.get(i);
-        							  NewMatrice.set(i,lineMatrice.concat("0 "));
         							  
-        						  }
+        							  NewMatrice.set(i,lineMatrice.concat("0 "));	  
         					  }
-        					  br.reset();
         					  
         				  }
         			  }
         			  // New matrice line for the new rule 
+        			  System.out.println("Attribute size :"+attrs.size());
         			  for (String attr : attrs){
         				  if (!Attributes.contains(attr)) NewMatriceLine+="0 ";
         				  else NewMatriceLine+="1 ";
@@ -224,6 +237,9 @@ class ThreadSockets extends Thread {
         		}
         		//Close the input stream
         		br.close(); 
+                 }finally{
+        		 lock.unlock();	
+        		 }
         		}
         		
         	}
@@ -233,7 +249,10 @@ class ThreadSockets extends Thread {
         		
         	}
     }
-    public static  void generateRcfFile(String Rules , String Attributes , List<String> matrices ) throws IOException{ 
+    public static  void generateRcfFile(String Rules , String Attributes , List<String> matrices ) throws IOException{
+    	ReentrantLock lock = new ReentrantLock();
+    	try{
+        lock.lock();
     	System.out.println("generate RCF FILE");
         PrintWriter writer = new PrintWriter("tmp_RuleFile.rcf", "UTF-8");
         // add initial line to file
@@ -258,7 +277,9 @@ class ThreadSockets extends Thread {
         // And rename tmp file's name to old file name
         File newFile = new File("tmp_RuleFile.rcf");
         newFile.renameTo(oldFile);
-    	
+    	}finally{
+    		lock.unlock();
+    	}
     	
     }
     

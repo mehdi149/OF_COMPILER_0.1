@@ -44,9 +44,9 @@ public class Compiler{
                   OpenFlow_Handler openFlow_handler = new OpenFlow_Handler();
               }
            }.start();
-           Thread.sleep(15000);
+           Thread.sleep(40000);
         //Input Params for the program
-        String [] s = "-compile RuleFile.rcf input/test_up.rcf 2 serial".split(" ");
+        String [] s = "-compile RuleFile.rcf input/test_up.rcf 3 serial".split(" ");
         args = s;
         String cmdline = args[0];
         String inputFilenameRCF = args[1];
@@ -114,16 +114,16 @@ public class Compiler{
         /**************** Generate Pipelines **************/
         EntryHandler entryHandler = new EntryHandler();
         ArrayList<Pipeline> pipelines= entryHandler.generateIndexPipeline(indexList, S); 
-        ArrayList<Pipeline> p = entryHandler.SortPipeline(pipelines, S);
-        Application app = entryHandler.appGenerator(lattice, indexList, ruleList,p);
+        //ArrayList<Pipeline> p = entryHandler.SortPipeline(pipelines, S);
+        Application app = entryHandler.appGenerator(lattice, indexList, ruleList,pipelines);
         ArrayList<Table> tables = new ArrayList<Table>(app.getAppTable().values());
         //system.out.println("/////////////////////||||||||||||||\\\\\\\\\\\\\\\\\\");
-        //system.out.println(pipelines);
+        System.out.println(pipelines);
         /*ClassificationValidator validator = new ClassificationValidator(pipelines,"/input/ovs.xml",tables);
         validator.total_flows_analysis();*/
          ApplicationHandler app_handler = new ApplicationHandler(app);
          app_handler.deliver_pipeline_to_switch();
-        System.out.println(p);
+        //System.out.println(p);
         
         /** Update of lattice 
          * First we generate a temporary lattice

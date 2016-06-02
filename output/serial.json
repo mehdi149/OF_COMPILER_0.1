@@ -14,5 +14,24 @@
 	"nodeStructure":{
 		"text":{"name":""},
 		"children":[
+			{
+			"text":{"name":"in_port=3??1.0"},
+			"children":[
+				{"text":{"name":"R0,R4"}, "HTMLclass":"rule_subset"}
+			  ]
+			 },
+			{
+			"text":{"name":"in_port=2??1.0"},
+			"children":[
+				{"text":{"name":"R3,R5,R6"}, "HTMLclass":"rule_subset"}
+			  ]
+			 },
+			{
+			"text":{"name":"in_port=1??1.0"},
+			"children":[
+				{"text":{"name":"R1,R2"}, "HTMLclass":"rule_subset"}
+			  ]
+			 }
+			]
 	}
 }

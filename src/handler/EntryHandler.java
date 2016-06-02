@@ -209,11 +209,7 @@ public class EntryHandler {
 				  if(j!=0) in_metadata = index.id;				  
 					Entry entry = new Entry(index.id, matchfield, action, tempId, in_metadata,out_metadata);
 					//System.out.println(entry.matchfield);
-				for (int g=0; g<S.path_processing.size();g++){
-					if(table.matchField.equals(S.path_processing.get(g).matchField)){
-						table.number_entry=S.path_processing.get(g).number_entry;
-					}
-				}
+			
 				boolean reached = false;
 				if (table.entry.size()<table.number_entry)
 					table.entry.add(entry);
@@ -327,7 +323,7 @@ public class EntryHandler {
 		System.out.println("-----------------------------");
 		System.out.println("-----------------------------");
 		System.out.println("-----------------------------");
-System.out.println(cachePipeline);
+		//System.out.println(cachePipeline);
 		return cachePipeline;
 	}
 	

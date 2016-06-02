@@ -1,0 +1,22 @@
+==============================
+Test du Module OpenFlow_Handler
+===============================
+
+Topologie sur Mininet 
+
+mn --topo=single,10 --controller=remote,ip=127.0.0.1,port=9992
+
+/* Topologie en etoile contenant 10 hotes connecte a un seul ovs 
+ *
+ *
+ **/
+
+Fichier rcf construit .
+
+
+Disponible sur test/RuleFile.rcf
+
+
+generation du pipeline reussie avec threshold = 3.
+
+

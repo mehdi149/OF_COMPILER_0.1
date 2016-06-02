@@ -414,7 +414,7 @@ public class LatticeHandler {
 				
 			}
 		}
-		
+		System.out.println(conceptStack);
 		return conceptStack;
 		
 	}
