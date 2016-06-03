@@ -104,6 +104,8 @@ public class Compiler{
         
         /** Extract significant concept from the set of all concepts **/
         ArrayList<Lat_Concept> favoriteConceptList = latticeHandler.getSignificantConcept(lattice);
+        
+       
         /** Generate Indexes **/
         TrieHandler trieHandler = new TrieHandler();
         ArrayList<Index> indexList = trieHandler.generateIndex(favoriteConceptList);
@@ -119,6 +121,7 @@ public class Compiler{
         ArrayList<Table> tables = new ArrayList<Table>(app.getAppTable().values());
         //system.out.println("/////////////////////||||||||||||||\\\\\\\\\\\\\\\\\\");
         System.out.println(pipelines);
+        System.out.println(app);
         /*ClassificationValidator validator = new ClassificationValidator(pipelines,"/input/ovs.xml",tables);
         validator.total_flows_analysis();*/
          ApplicationHandler app_handler = new ApplicationHandler(app);
@@ -221,6 +224,7 @@ public class Compiler{
 //            //system.out.print(header);
 //            //system.out.print(trieToText);
 //            //system.out.print(foot);
+            
             
         }
         catch(IOException ioe){System.out.println("erreur : " + ioe );}

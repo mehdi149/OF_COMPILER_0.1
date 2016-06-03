@@ -1,0 +1,26 @@
+=============================================
+Test des pipelines genere par le compilateur
+=============================================
+
+Topologie  utilise sur mininet
+ commande = > sudo mn --topo=single,10 --controller=remote,ip=127.0.0.1,port=9992
+              topologie en etoile contenant un ovs connecte a 10 hotes 
+
+AVANT compilation:
+ ===> Fichier Rcf genere apres avoir effectue la commande ping all sur mininet ,
+ disponible sur test/Scenarios2/RuleFile.rcf
+
+Apres Compilation
+ commande sur mininet >> pingall  (Sucess).
+
+commande pour visualise les pipelines genere sur ovs
+
+ovs-vsctl dump-flows s1 -O OpenFlow13.
+
+
+
+
+
+
+
+

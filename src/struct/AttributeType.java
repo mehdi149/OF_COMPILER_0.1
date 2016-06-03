@@ -7,11 +7,13 @@ package struct;
  */
 public enum AttributeType {
 	eth_dst,
+	eth_src,
 	in_port,
 	eth_type,
 	ip_proto,
 	udp_src,
 	ipv4_dst,
+	ipv4_src,
 	IngressPort,
 	IngressVPort,
 	EtherSrc,

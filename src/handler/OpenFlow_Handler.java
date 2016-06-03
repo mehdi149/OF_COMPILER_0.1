@@ -8,6 +8,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,6 +24,7 @@ import org.projectfloodlight.openflow.protocol.OFMessage;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.OFType;
 import org.projectfloodlight.openflow.protocol.OFVersion;
+import org.projectfloodlight.openflow.protocol.action.OFAction;
 import org.projectfloodlight.openflow.protocol.match.Match;
 import org.projectfloodlight.openflow.protocol.match.MatchField;
 
@@ -80,10 +83,12 @@ public class OpenFlow_Handler {
 
 class ThreadSockets extends Thread {
     public  Socket sClient;
+    public static LinkedHashMap<String,List<OFAction>> RuleAction = new LinkedHashMap<String,List<OFAction>>() ;
     public OutputStream outToClient;
     private final String SERVER_URL;
     private final int SERVER_PORT;
     public static PrintWriter writerRcf;
+    static int nbrOFRules=0;
     ThreadSockets(Socket sClient, String ServerUrl, int ServerPort) throws FileNotFoundException, UnsupportedEncodingException {
         this.SERVER_URL = ServerUrl;
         this.SERVER_PORT = ServerPort;
@@ -99,17 +104,26 @@ class ThreadSockets extends Thread {
         this.start();
     }
     public static void OFHandler(List<OFMessage> msgs) throws IOException{
+
         for (OFMessage msg : msgs){
         	System.out.println(msgs.size());
         	
         	if( msg.getType() == OFType.FLOW_MOD){
         		// get of flow mod rule and add it to rcf 
-        		System.out.println("of flow mod");
+        	
+        		
         		OFFlowMod flow_mod_msg = (OFFlowMod)msg;
         		Match match = flow_mod_msg.getMatch();
+        		
+        		// get Action 
+        		
         		String match_string = match.toString();
         		if(!match_string.equals("OFMatchV3Ver13()")){
-        			
+        	    nbrOFRules+=1;
+                System.out.println("===============Number of Rules=============== : "+nbrOFRules);
+                System.out.println("of flow mod");
+        		List<OFAction> actions =  flow_mod_msg.getActions();
+        		System.out.println("actions : "+actions);
         		System.out.println("match :"+match);
         		match_string =  match_string.replace("OFMatchV3Ver13(","");
         		match_string =  match_string.replace(")","");
@@ -119,9 +133,8 @@ class ThreadSockets extends Thread {
         		String Attribute_rcf_delimited = String.join(" | ",Attributes);
         		System.out.println(Attribute_rcf_delimited);
         		// Open the file
-        		ReentrantLock lock = new ReentrantLock();
-        		try{
-                lock.lock();
+        	
+        		
         		FileInputStream fstream = new FileInputStream("RuleFile.rcf");
        
         		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
@@ -150,6 +163,7 @@ class ThreadSockets extends Thread {
         			  System.out.println(RuleLine.split("\\|").length);
         			  nbrOfRules = Arrays.asList(RuleLine.split("\\|")).size();
         			  String RuleName = "R"+(nbrOfRules-1);
+        			  RuleAction.put(RuleName, actions);
         			  New_Rules= strLine.concat(RuleName+" | ");
         			  System.out.println("New_Rules");
         			  System.out.println(New_Rules);
@@ -162,6 +176,9 @@ class ThreadSockets extends Thread {
         			  for(int tmp=0;tmp<attrs.size();tmp++){
         				 
         				 attrs.set(tmp,attrs.get(tmp).trim());
+        			  }
+        			  for(int tmp=0;tmp<Attributes.size();tmp++){
+        				  Attributes.set(tmp, Attributes.get(tmp).trim());
         			  }
         			  // Adding New Attributes  to  Rcf File 
         			  System.out.println(attrs);
@@ -226,6 +243,7 @@ class ThreadSockets extends Thread {
         		if (cpt == RulePosition){
         		  System.out.println("Doesn't find");
   				  String RuleName = "R"+"0"+" | ";
+  				  RuleAction.put("R0", actions);
   				  List<String> Matrice=new ArrayList<String>();
   				  String line = "";
   				  for(int i=0 ;i<Attributes.size();i++){
@@ -237,9 +255,7 @@ class ThreadSockets extends Thread {
         		}
         		//Close the input stream
         		br.close(); 
-                 }finally{
-        		 lock.unlock();	
-        		 }
+
         		}
         		
         	}
@@ -248,11 +264,10 @@ class ThreadSockets extends Thread {
         		
         		
         	}
+    
     }
     public static  void generateRcfFile(String Rules , String Attributes , List<String> matrices ) throws IOException{
-    	ReentrantLock lock = new ReentrantLock();
-    	try{
-        lock.lock();
+
     	System.out.println("generate RCF FILE");
         PrintWriter writer = new PrintWriter("tmp_RuleFile.rcf", "UTF-8");
         // add initial line to file
@@ -277,12 +292,19 @@ class ThreadSockets extends Thread {
         // And rename tmp file's name to old file name
         File newFile = new File("tmp_RuleFile.rcf");
         newFile.renameTo(oldFile);
-    	}finally{
-    		lock.unlock();
-    	}
     	
     }
+
+		
     
+    public  void replyToSwitch(byte[] reply,int index ,int readable_bytes) throws IOException{
+    	 final Object lock = new Object();
+	        synchronized(lock){
+	        	outToClient.write(reply, index, readable_bytes);
+	        	
+	        }
+    	
+    }
     public void run() {
         try {
             final byte[] request = new byte[1024];
@@ -301,6 +323,7 @@ class ThreadSockets extends Thread {
             }
             final InputStream inFromServer = server.getInputStream();
             final OutputStream outToServer = server.getOutputStream();
+            int nbrOfRules=0;
             new Thread() {
                 public void run() {
                     int bytes_read;
@@ -336,7 +359,8 @@ class ThreadSockets extends Thread {
             try {
                 while ((bytes_read = inFromServer.read(reply)) != -1) {
                 	 System.out.println("serialize");
-                    outToClient.write(reply, 0, bytes_read);
+                    //outToClient.write(reply, 0, bytes_read);
+                    replyToSwitch(reply, 0, bytes_read);
                     ByteBuf bb= wrappedBuffer(reply,0,bytes_read);
                     bb.order(ByteOrder.BIG_ENDIAN);
                     OFMessageReader<OFMessage> reader= OFFactories.getGenericReader();
@@ -353,15 +377,14 @@ class ThreadSockets extends Thread {
                        results.add(ofm);
                         
                     }
- 
+                   
 				System.out.println(results);
                     // get of flow Mod packet type and store it to rcf file 
-                   new Thread(){public void run(){try {
+				        final Object lock = new Object();
+				        synchronized(lock){
 						ThreadSockets.OFHandler(results);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}}}.start();
+				        }
+				
                     }        
                 
             } catch (IOException e) {
