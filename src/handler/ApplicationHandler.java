@@ -30,6 +30,7 @@ import org.projectfloodlight.openflow.protocol.action.OFActions;
 import org.projectfloodlight.openflow.protocol.instruction.OFInstruction;
 import org.projectfloodlight.openflow.protocol.instruction.OFInstructionApplyActions;
 import org.projectfloodlight.openflow.protocol.instruction.OFInstructionGotoTable;
+import org.projectfloodlight.openflow.protocol.instruction.OFInstructionWriteMetadata;
 import org.projectfloodlight.openflow.protocol.instruction.OFInstructions;
 import org.projectfloodlight.openflow.protocol.match.Match;
 import org.projectfloodlight.openflow.protocol.match.Match.Builder;
@@ -40,7 +41,9 @@ import org.projectfloodlight.openflow.types.IPv4AddressWithMask;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.Masked;
 import org.projectfloodlight.openflow.types.OFBufferId;
+import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.TableId;
+import org.projectfloodlight.openflow.types.U64;
 import org.projectfloodlight.openflow.protocol.match.MatchField;
 
 import com.google.common.collect.ImmutableList;
@@ -299,10 +302,19 @@ public class ApplicationHandler {
                 
                 }
                 //system.out.println();
+                // set metadata match , setInstructionsWriteMetadata
+                
+                int in_metadata = entry.in_metadata;
+                
+                int out_metadata = entry.out_metadata;
+                match.createBuilder().setMasked(MatchField.METADATA,OFMetadata.of(U64.of(in_metadata)), OFMetadata.NO_MASK);
                  OFActions actions_subset = my13Factory.actions();
-                 OFInstructionGotoTable instructions = my13Factory.instructions().gotoTable(TableId.of(next_table_id));
-                 List<OFInstruction> listInstruction =ImmutableList.<OFInstruction> of(
-                         instructions);
+                 OFInstruction instructions = my13Factory.instructions().gotoTable(TableId.of(next_table_id));
+                 OFInstructionWriteMetadata instruction_metadata = my13Factory.instructions().writeMetadata(U64.of(out_metadata),U64.ZERO);
+                 ArrayList<OFInstruction> listInstruction  = new ArrayList<OFInstruction>();
+   
+                 listInstruction.add(instruction_metadata);
+                 listInstruction.add(instructions);
                  add_flow(id_table,match,listInstruction,new ArrayList<OFAction>(),1);
                                  
             }

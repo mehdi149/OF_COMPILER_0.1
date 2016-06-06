@@ -44,7 +44,8 @@ public class Compiler{
                   OpenFlow_Handler openFlow_handler = new OpenFlow_Handler();
               }
            }.start();
-           Thread.sleep(40000);
+         Thread.sleep(40000); 
+    	
         //Input Params for the program
         String [] s = "-compile RuleFile.rcf input/test_up.rcf 3 serial".split(" ");
         args = s;
